@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <meta charset="utf-8" name="viewport" content="width=device-width, user-scalable=no">
+		<title>Craps Table</title>
+		<style>
+			body { 
+                margin:0;
+            }
+			#test{
+				font-size:32px;
+				position:absolute;
+				bottom:10px;
+                left:285px;
+                padding:8px;
+                background-color:rgba(0, 0, 0, 0.1);
+                margin-left:20px;
+                border-radius: 10px 10px 10px 10px;
+			}
+            #bet-container {
+                position:absolute;
+                margin-top:20px;
+                margin-left:20px;
+                background-color:rgba(0, 0, 0, 0.1);
+                border-radius: 10px 10px 10px 10px;
+                padding:20px;
+            }
+            button {
+                font-size:20px;
+                border:none;
+                box-shadow: 2px 2px 2px 2px rgba(0, 0,0, .2);
+                margin-bottom:8px;
+                min-width: 120px;
+            }
+            .menutext1 {
+                font-size:48px;
+                margin:10px;
+                margin-left:0px;
+                color:#ddd22c;
+                margin-top:0px;
+            }
+            #pb-currentSelection,#pb-currentBetTotal,#pb-currentMoney {
+                margin:0px;
+                margin-bottom:4px;
+                color:white;
+            }
+            #test-text{
+                font-size:22px;
+                float:right;
+                color:#ddd22c;
+            }
+            .chair {
+                background-color:rgba(0, 0, 0, 0.1);
+                width:100px;
+                height:80px;
+                text-align:center;
+                font-size:12px;
+                color:black;
+                font-weight:bold;
+                border-radius:8px;
+            }
+            #chair0 {
+                position:absolute;
+                right:60px;
+                bottom:20px;
+                width:220px;
+                height:160px;
+            }
+            #chair1 {
+                position:absolute;
+                left:500px;
+                top:80px;
+            }
+            #chair2 {
+                position:absolute;
+                left:1300px;
+                top:80px;
+            }
+            #chair3 {
+                position:absolute;
+                left:1600px;
+                top:340px;
+            }
+            #chair4 {
+                position:absolute;
+                left:600px;
+                top:770px;
+            }
+            .fl {
+                float:left;
+            }
+            .fr {
+                float:right;
+            }
+            #count-down {
+                position:absolute;
+                right:60px;
+                top:60px;
+                font-size:32px;
+                font-weight:bold;
+                color:white;
+            }
+		</style>
+	</head>
+	<body style="background-image: url('./textures/crapstable.jfif');background-size: cover;">
+		<div id="test">
+            <img src="./textures/dealericon.png" style="float:left;"></img>
+            <p id="test-text">To roll the dice, simply click it or press Enter (numpad acceptable)!</p>
+        </div>
+        <div id="bet-container">
+            <p class="menutext1">Place a Bet</p><hr>
+            <p id="pb-currentSelection">Current Selected Chip: ($5)</p>
+            <p id="pb-currentMoney">Current Money: None</p>
+            <p id="pb-currentBetTotal" style="margin-bottom:10px;">Current Total Bet: None</p><hr>
+            <button onclick="client.placeBet(this);">Passline</button>
+            <button class="fr"onclick="client.placeBet(this);">Come</button><br>
+            <button onclick="client.placeBet(this);">Field</button>
+            <button class="fr" onclick="client.placeBet(this);">Dont Pass</button><br><hr>
+            
+            <button onclick="client.placeBet(this);">Four</button>
+            <button class="fr" onclick="client.placeBet(this);">Five</button><br>
+            <button onclick="client.placeBet(this);">Six</button>
+            <button class="fr" onclick="client.placeBet(this);">Seven</button><br>
+            <button onclick="client.placeBet(this);">Eight</button>
+            <button onclick="client.placeBet(this);">Nine</button><br>
+            <button onclick="client.placeBet(this);">Ten</button><br><hr>
+            
+            <button onclick="client.placeBet(this);">Hard Two</button>
+            <button class="fr" onclick="client.placeBet(this);">Hard Three</button><br>
+            <button onclick="client.placeBet(this);">Hard Four</button>
+            <button class="fr" onclick="client.placeBet(this);">Hard Six</button><br>
+            <button onclick="client.placeBet(this);">Hard Eight</button>
+            <button class="fr" onclick="client.placeBet(this);">Hard Ten</button><br>
+            <button onclick="client.placeBet(this);">Hard Eleven</button>
+            <button class="fr" onclick="client.placeBet(this);">Hard Twelve</button><br><hr>
+            <button onclick="client.placeBet(this);">Horn Bet</button>
+            <button class="fr" onclick="client.placeBet(this);">Any Craps</button><br><hr><br>
+            <button onclick="client.removeBets(this);" style="background-color:#e06c57;">Remove Bets</button>
+        </div>
+        <div id="count-down">5</div>    
+    
+        <div id="chair1" class="chair" style="background-image: url('./textures/gambler.jfif');background-size: contain;background-size: cover;">Jhonnyblaze320</div>
+        <div id="chair2" class="chair" style="background-image: url('./textures/gambler.jfif');background-size: contain;background-size: cover;">emmathegambler</div>
+        <div id="chair3" class="chair" style="background-image: url('./textures/gambler.jfif');background-size: contain;background-size: cover;">BillyRaY</div>
+        <div id="chair4" class="chair" style="background-image: url('./textures/gambler.jfif');background-size: contain;background-size: cover;">suchasharkx600</div>
+        <div id="chair0" class="chair" style="background-image: url('./textures/gambler.jfif');background-size: contain;background-size: cover;">U S E R</div>
+        
+        <audio id="diceShake" style="display:none" src="sounds/diceshake.wav"></audio>
+        <audio id="goodRoll" style="display:none" src="sounds/goodroll.wav"></audio>
+        <audio id="rollFail" style="display:none" src="sounds/rollFail.ogg"></audio>
+        <audio id="clicksound1" style="display:none" src="sounds/clicksound1.wav"></audio>
+        <audio id="chipPlacement" style="display:none" src="sounds/chipPlacement.wav"></audio>
+        <audio id="applause1" style="display:none" src="sounds/applause1.wav"></audio>
+        <audio id="aww" style="display:none" src="sounds/aww.wav"></audio>
+    
+        <audio id="easy4" style="display:none" src="sounds/announcer/f1_easy4.mp3"></audio>
+        <audio id="hard4" style="display:none" src="sounds/announcer/f1_hard4.mp3"></audio>
+        <audio id="easy5" style="display:none" src="sounds/announcer/f1_easy5.mp3"></audio>
+        <audio id="easy6" style="display:none" src="sounds/announcer/f1_easy6.mp3"></audio>
+        <audio id="hard6" style="display:none" src="sounds/announcer/f1_hard6.mp3"></audio>
+        <audio id="7" style="display:none" src="sounds/announcer/f1_7.mp3"></audio>
+        <audio id="craps" style="display:none" src="sounds/announcer/f1_craps.mp3"></audio>
+        <audio id="easy8" style="display:none" src="sounds/announcer/f1_easy8.mp3"></audio>
+        <audio id="hard8" style="display:none" src="sounds/announcer/f1_hard8.mp3"></audio>
+        <audio id="9" style="display:none" src="sounds/announcer/f1_9.mp3"></audio>
+        <audio id="easy10" style="display:none" src="sounds/announcer/f1_easy10.mp3"></audio>
+        <audio id="hard10" style="display:none" src="sounds/announcer/f1_hard10.mp3"></audio>
+        <audio id="boxcar" style="display:none" src="sounds/announcer/f1_boxcar.mp3"></audio>
+        <audio id="hard4" style="display:none" src="sounds/announcer/f1_hard4.mp3"></audio>
+        <audio id="snakeeyes" style="display:none" src="sounds/announcer/f1_2.mp3"></audio>
+    
+		<script src="js/three.js"></script>
+		<script>
+            // old body tag body: style="background-image: url('./textures/crapstable.jfif');background-size: cover;">
+            // <source id="diceShake" src="sounds/diceshake.wav" type='audio/wav'>
+            // ************ CLASSES ************
+            // *********************************
+            Array.prototype.random = function () {
+                if(this.length == 1) return this[0];
+                return this[Math.floor((Math.random()*this.length))];
+            }
+            var cursorX;
+            var cursorY;
+            document.onmousemove = function(e){
+                cursorX = e.pageX;
+                cursorY = e.pageY;
+            }
+            setInterval("checkCursor()", 1000);
+            function checkCursor(){
+                // helpers.log("Cursor at: " + cursorX + ", " + cursorY);
+            }
+            function setupKeyControls() {
+              document.onkeydown = function(e) {
+                switch (e.keyCode) {
+                  case 13:
+                        if(helpers.timeSince(table.lastRollTime) >= table.rollTimeout) {
+                            dice.onClick();
+                        } else {
+                            ui.dealerSay("We are in the betting phase, you cannot roll the dice yet.");
+                            sounds.play(sounds.clicksound1);
+                        }
+                  break;
+                }
+              };
+            }
+            setupKeyControls();
+            
+                        
+            class client {
+                static money = 100;
+                static remove(amount) {
+                    if(amount >= client.money)
+                        client.money = 0;
+                    else
+                        client.money -= amount;
+                }
+                static add(amount) {
+                    client.money += amount;
+                }
+                static removeBet(betType) {
+                    var chipsArray = chips.getChipsByBetType(betType);
+                    if(chipsArray.length > 0) {
+                        var total = bets.totals[betType];
+                        bets.totals[betType] = 0;
+                        bets.total -= total;
+                        chipsArray.forEach(function(chip) {
+                           // chips.slideToDeleteOnDestination(chip, ); 
+                            helpers.deleteObj(chip);
+                        });
+                        ui.refreshBetPanel();
+                    }
+                }
+                static placeBet(el) {
+                    if(chips.currentSelection == 0) {
+                        document.getElementById("test-text").innerText = "Select a chip first before trying to place a bet!";
+                        sounds.play(sounds.rollFailSound);
+                    } else {
+                        if((client.money + 1) - (chips.currentSelection + bets.total) <= 0) {
+                            document.getElementById("test-text").innerText = "You don't have enough $ to place that bet!";
+                            return;
+                        }
+                        bets.add(el.innerText, chips.currentSelection);
+                        document.getElementById('pb-currentBetTotal').innerText='Current Total Bet: ' + bets.total;
+                        document.getElementById('pb-currentMoney').innerText = "Current Money: " + (client.money - bets.total);
+                        var loc = table.getRandomLocation(el.innerText);
+                        var chip = chips.drawChipAndSlideTo(0,-3,loc[0], loc[1], chips.getColorFromValue(chips.currentSelection));
+                        chip.bet = {
+                            type: el.innerText.toLowerCase()
+                        }
+                        helpers.schedule(300,function() {sounds.play(sounds.chipPlacementSound)});
+                    }
+                }
+                static removeBets() {
+                    bets.clearAndGive();
+                }
+            }
+            
+            class aiClient {
+                static money = 100;
+                static remove(amount) {
+                    if(amount >= client.money)
+                        aiClient.money = 0;
+                    else
+                        aiClient.money -= amount;
+                }
+                static add(amount) {
+                    aiClient.money += amount;
+                }
+                static joinTable(name) {
+                    
+                }
+                static leaveTable(name) {
+                    
+                }
+            }
+            
+            class clientContainer {
+                static ais = [];
+                static players = [];
+                static types = {
+                    ai:"ai",
+                    player:"player"
+                }
+            
+                static byName(name) {
+                    var found = [];
+                    ais.forEach(function(ai) {
+                        if(clientContainer.ai.name.toLowerCase() == name.toLowerCase())
+                            found.push(ai);
+                    });
+                    players.forEach(function(player){
+                        if(clientContainer.players.name.toLowerCase() == name.toLowerCase())
+                            found.push(player);
+                    });
+                    return found;
+                }
+                
+                static add(type, name="none") {
+                    var clientObj = {};
+                    if(type.toLowerCase() != clientContainer.types.player) {
+                        clientObj.name = name;
+                        clientObj.type = type;
+                        clientContainer.ais.push(clientObj);
+                    } else {
+                        clientObj.name = name;
+                        clientObj.type = type;
+                        clientContainer.players.push(clientObj);
+                    }
+                }
+            
+                static remove(clientObj) {
+                    if(clientObj.type == clientContainer.types.ai)
+                        helpers.arrayRemove(clientContainer.ais, clientObj);
+                    if(clientObj.type == clientContainer.types.player)
+                        helpers.arrayRemove(clientContainer.players, clientObj);
+                }
+            
+                static removeByName(clientName) {
+                    //TODO - remove by name..
+                    var detected = false;
+                    clientContainer.players.forEach(function(player) {
+                        if(player.name == clientName) {
+                            helpers.arrayRemove(clientContainer.players, player);
+                            detected = true;
+                        }
+                    });
+                    if(!detected) {
+                        clientContainer.ais.forEach(function(aiplayer) {
+                            if(aiplayer.name == clientName) {
+                                helpers.arrayRemove(clientContainer.ais, aiplayer);
+                            }
+                        });
+                    }
+                }
+            }
+            
+            // Make sure to also add a sound
+            // element in the HTML section
+            class sounds {
+                static diceShakeSound = "diceShake";
+                static goodRollSound = "goodRoll";
+                static rollFailSound = "rollFail";
+                static clicksound1 = "clicksound1";
+                static chipPlacementSound = "chipPlacement";
+                static applause1Sound = "applause1";
+                static aww = "aww";
+
+                static soundsList = {
+                    diceShakeSound:"diceShake",
+                    goodRollSound: "goodRoll",
+                    rollFailSound: "rollFail",
+                    clicksound1: "clicksound1",
+                    chipPlacementSound: "chipPlacement",
+                    applause1Sound: "applause1",
+                    aww: "aww"
+                }
+                static play(playWhich, volume = 0.3) {
+                    // References a sound element
+                    var el = document.getElementById(playWhich);
+                    if(el) {
+                        el.pause();
+                        el.volume = volume;
+                        el.play();
+                    }
+                }
+            }
+            
+            sounds.announcer = class {
+                static voiceRoll(rollNumber, volume = 0.16, isHard=false, iscraps=false) {
+                    if(iscraps) {
+                        sounds.play("craps");
+                        return;
+                    }
+                    var prefix = "easy";
+                    var rollNumStr = rollNumber.toString();
+                    if(isHard) prefix = "hard";
+                    if(dice.lastRollDie[0] == dice.lastRollDie[1])
+                        prefix = "hard";
+                    if(rollNumber == 7) prefix = "";
+                    if(rollNumber == 3) prefix = "";
+                    if(rollNumber == 9) prefix = "";
+                    if(rollNumber == 2) { 
+                        prefix = "snakeeyes";
+                        rollNumStr = "";
+                    }
+                    if(rollNumber == 11){
+                        prefix = "boxcar";
+                        rollNumStr = "";
+                    }
+                    console.log("trying voice for " + prefix + rollNumStr)
+                    sounds.play(prefix + rollNumStr, volume);
+                }
+            }
+            
+            class helpers {
+                static timeNowMS() {
+                    return +new Date();
+                }
+                static timeSince(previousTimeMS) {
+                    return helpers.timeNowMS() - previousTimeMS;
+                }
+                static log(m) {
+                    console.log(m);
+                }
+                static randomNumber(min, max) {
+                    max = max + 1;
+                    var ran = Math.floor(Math.random() * (max - min) + min);
+                    return ran;
+                } 
+                static randomNumberDecimal(min, max) {
+                  var precision = 100; // 2 decimals
+                  var randomnum = Math.floor(Math.random() * (max * precision - min* precision) + 1 * precision) / (1*precision); 
+                  return randomnum;
+                }
+                static roundNumberToNearest(num,numnearest=10) {
+                    return Math.round(num / numnearest) * numnearest;
+                }
+                static dump(obj) {
+                    console.log("my object: %o", obj);
+                }
+                static deleteObj(obj) {
+                    scene.scene.remove(obj);
+                    try {
+                        obj.geometry.dispose();
+                        obj.material.dispose();
+                        obj = undefined;
+                    } catch {
+                        helpers.log("Obj provided was null or cannot reference a data point on it!");    
+                    }
+                }
+                static schedule(ms, func) {
+                    var timeout = setTimeout(func, ms);
+                    return timeout;
+                }
+                static repeat(msDelay, func) {
+                    func();
+                    var rep = setInterval(func, msDelay);
+                    return rep;
+                }
+                static repeatStop(repeatHandle) {
+                    return clearInterval(repeatHandle);
+                }
+                static inRegion(meshObj, x1, y1, x2, y2) {
+                    var mx = meshObj.position.x;
+                    var my = meshObj.position.y;
+                    if((mx >= x1 && mx <= x2) && (my >= y1 && my <= y2))
+                        return true;
+                    return false;
+                }
+                static arrayRemove(arr, item) {
+                    const index = arr.indexOf(item);
+                    var popped = undefined;
+                    if (index > -1) {
+                        popped = arr.splice(index, 1);
+                    }
+                    return popped;
+                }
+                static getNumberFromWordNumber(word) {
+                    var d = {
+                        "two": 2,
+                        "three": 3,
+                        "four": 4,
+                        "five": 5,
+                        "six": 6,
+                        "seven": 7,
+                        "eight": 8,
+                        "nine": 9,
+                        "ten": 10,
+                        "eleven": 11,
+                        "twelve": 12
+                    };
+                    return d[word.toLowerCase()];
+                }
+                static getNumberWordFromNumber(number) {
+                    var d = {
+                        2: "two",
+                        3: "three",
+                        4: "four",
+                        5: "five",
+                        6: "six",
+                        7: "seven",
+                        8: "eight",
+                        9: "nine",
+                        10: "ten",
+                        11: "eleven",
+                        12: "twelve"
+                    };
+                    return d[number];
+                }
+            }
+            
+            class ui {
+                static currentCountDown = 0;
+                static currentCountDownRepeatHandle = "";
+                static hideBetPanel() {
+                    document.getElementById("bet-container").style.display = "none";
+                }
+                static showBetPanel() {
+                    document.getElementById("bet-container").style.display = "inline-block";
+                }
+                static refreshBetPanel() {
+                    document.getElementById('pb-currentBetTotal').innerText='Current Total Bet: ' + bets.total;
+                    document.getElementById('pb-currentMoney').innerText = "Current Money: " + (client.money - bets.total);
+                }
+                static dealerSay(text) {
+                    document.getElementById('test-text').innerText= text;
+                }
+                static countDown(number) {
+                    ui.currentCountDown = number;
+                    // document.getElementById('count-down').innerText = number.toString();
+                    ui.currentCountDownRepeatHandle = helpers.repeat(1000, function(){
+                        ui.currentCountDown--;
+                        console.log("current cd: " + ui.currentCountDown);
+                        if(ui.currentCountDown <= 0) {
+                            helpers.repeatStop(ui.currentCountDownRepeatHandle);
+                            document.getElementById("count-down").innerText = "Dice coming out!";
+                            sounds.play(sounds.goodRollSound,0.1);
+                        } else {
+                            document.getElementById("count-down").innerText = "Betting Phase: " + ui.currentCountDown.toString();
+                        }
+                    });
+                }
+            }
+            
+            ui.countDown(5);
+        
+            
+            class bets {
+                static total = 0;
+                static totals = {};
+                static add(betType, amount) {
+                    betType = betType.toLowerCase();
+                    bets.total += amount;
+                    if(bets.totals[betType] == undefined) {
+                        bets.totals[betType] = 0;
+                    }
+                    bets.totals[betType] += amount;
+                    console.log(bets.totals[betType] + " for " + betType);
+                }
+            
+                static checkForPayout() {
+                    var lastRollTotal = dice.lastRollTotal;
+                    var lastRollTotalText = dice.wordFromValue(lastRollTotal).toLowerCase();
+                    if(bets.totals[lastRollTotalText] != undefined && bets.totals[lastRollTotalText] >= 0) {
+                        bets.payoutDrawWinningChipAnimation(lastRollTotalText);
+                        client.money += bets.totals[lastRollTotalText];
+                        ui.refreshBetPanel();
+                        sounds.play(sounds.goodRollSound);
+                        
+                    }
+                }
+            
+                static payout() {
+                    if(bets.totals["passline"] != undefined && bets.totals["passline"] >= 1) {
+                        client.money += bets.totals["passline"];
+                        bets.payoutDrawWinningChipAnimation("passline");
+                    }                    
+                    ui.refreshBetPanel();
+                }
+            
+                static payoutDrawWinningChipAnimation(betType, playerIndex=0, extraChips=0) {
+                    var extraChipsArr = [];
+                    var x = table.locations[betType][0][0];
+                    var y = table.locations[betType][0][1];
+                    var total = bets.totals[betType];
+                    var chipAmount = (total / 5) - 1; // white chips for now i guess (could be bad for huge bets, animation-wise)
+                    if(chipAmount == 0) chipAmount = 1;
+                    for(var i = 0;i<extraChips + chipAmount;i++) {
+                        extraChipsArr.push(chips.drawChip(x + Math.floor(helpers.randomNumber(-1,1)/2),y + Math.floor(helpers.randomNumber(-1,1)/2), true));
+                    }
+                    //var chip = chips.drawChip(x,y, true);
+                    // chips.chipSlideToPlayerLocation(chip, playerIndex);
+                    if(extraChipsArr.length > 0)
+                        for(var i=0; i<extraChipsArr.length;i++) {
+                           chips.chipSlideToPlayerLocation(extraChipsArr[i], playerIndex);
+                        }
+                }
+            
+                static payoutDontPassCheck() {
+                    var point = table.currentPoint;
+                    if(bets.totals["dont pass"] != undefined && bets.totals["dont pass"] >= 1) {
+                        if(point == 0 && (dice.lastRollTotal == 2 || dice.lastRollTotal == 3 || dice.lastRollTotal == 12)) {
+                            client.money += bets.totals["dont pass"];
+                            bets.payoutDrawWinningChipAnimation("dont pass");
+                        } else if(point == 0 && (dice.lastRollTotal == 7 || dice.lastRollTotal == 11)) {
+                            client.money -= bets.totals["dont pass"];
+                            client.removeBet("dont pass");
+                        }
+                        else if(dice.lastRollTotal == 7) {
+                            client.money += bets.totals["dont pass"];
+                        } else if(dice.lastRollTotal == point) {
+                            client.money -= bets.totals["dont pass"];
+                            client.removeBet("dont pass");
+                        }
+                    }         
+                    ui.refreshBetPanel();
+                }
+            
+                static payoutFieldCheck() {
+                    var point = table.currentPoint;
+                    var lastRollTotal = dice.lastRollTotal;
+                    var lastRollTotalText = dice.wordFromValue(lastRollTotal).toLowerCase();
+                    if(bets.totals["field"] != undefined && bets.totals["field"] >= 1 && point > 0) {
+                        var payoutDouble = false;
+                        if(lastRollTotal == 2 || lastRollTotal == 12) {
+                            payoutDouble = true;
+                            client.money += bets.totals["field"] * 2;
+                            sounds.play(sounds.goodRollSound);
+                            bets.payoutDrawWinningChipAnimation("field",0,1);
+                        }
+                        else if(lastRollTotal == 3 || lastRollTotal == 4 || lastRollTotal == 9
+                               || lastRollTotal == 10 || lastRollTotal == 11) {
+                            client.money += bets.totals["field"];
+                            sounds.play(sounds.goodRollSound);
+                            bets.payoutDrawWinningChipAnimation("field");
+                        } else {
+                            client.money -= bets.totals["field"];
+                        }
+                        client.removeBet("field");
+                        ui.refreshBetPanel();
+                    }
+                }
+                
+                static payoutHardCheck() {
+                    var total = dice.lastRollTotal;
+                    var die = dice.lastRollDie;
+                    if((die[0] == die[1] && total > 0) || (total == 3 || total == 11)) {
+                        var payoutMultiplier = {
+                            2 : 30, 
+                            3 : 15, 
+                            12 : 30,
+                            6 : 9, 
+                            10 : 7, 
+                            8 : 9,
+                            4 : 7, 
+                            11 : 16, 
+                            'seven': 4,
+                            'any craps': 7
+                        }
+                        var payout = payoutMultiplier[total];
+                        var hardbets = bets.getHardBets();
+                        var winningHardBet = bets.filterHardBetsByWin(hardbets);
+                        if(winningHardBet != undefined) {
+                            client.money += Math.floor(bets.totals[winningHardBet] * payoutMultiplier[total]);
+                            bets.removeHardbets([total], false);
+                            bets.payoutDrawWinningChipAnimation("field",0,1);
+                        } else {
+                            // no hard
+                        }
+                        bets.removeHardbets([2,12,3,11]);
+                        ui.refreshBetPanel();
+                        // clear hard bets (lower ones only)
+                    }
+                }
+            
+                static getHardBets() {
+                    var hardbets = [];
+                    var hbs = ["hard two","hard four", "hard three", "hard six", "hard eight", "hard ten", "hard eleven", "hard twelve",
+                              "horn bet","seven","any craps"];
+                    hbs.forEach(function(b) {
+                         if(bets.totals[b] != undefined) {
+                             hardbets.push(b);
+                         }
+                    });
+                    return hardbets;
+                }
+                        
+                static filterHardBetsByWin(hardBetsArray) {
+                    var total = dice.lastRollTotal;
+                    var hbr = undefined;
+                    hardBetsArray.forEach(function(hb) {
+                        var hbvalue = helpers.getNumberFromWordNumber(hb.split(' ')[1]);
+                        if(total == hbvalue) {
+                            hbr = hb;
+                        }
+                    });
+                    return hbr;
+                }
+            
+                static removeHardbets(betsArray, andTakeMoney=true) {
+                    betsArray.forEach(function(betNumber) {
+                        var _chips = chips.getChipsByBetType("hard " + helpers.getNumberWordFromNumber(betNumber));
+                        _chips.forEach(function(chip) {
+                           chips.chipSlideToPlayerLocation(chip);
+                        });
+                        if(andTakeMoney) {
+                            if(bets.totals["hard " + helpers.getNumberWordFromNumber(betNumber)] != undefined) {
+                                client.money -= bets.totals["hard " + helpers.getNumberWordFromNumber(betNumber)];
+                                bets.total -= bets.totals["hard " + helpers.getNumberWordFromNumber(betNumber)];
+                            }
+                        }
+                        bets.totals["hard " + helpers.getNumberWordFromNumber(betNumber)] = undefined;
+                        
+                    }); 
+                }
+            
+                static payoutAndMoveComeBets() {
+                    var lastRollTotal = dice.lastRollTotal;
+                    var lastRollTotalText = dice.wordFromValue(lastRollTotal).toLowerCase();
+                    var currentComeBets = bets.getComeBets();
+                    var asArrayObjects = currentComeBets[1];
+                    if(asArrayObjects.length > 0) {
+                        // come bet syntax is as below
+                        // bets.totals["come"]  for main come bet
+                        // bets.totals["come1"]
+                        // bets.totals["come2"] etc current come bet values
+                        asArrayObjects.forEach(function (comeBet) {
+                            //alert("come bets " + comeBet[Object.keys(comeBet)[0]]);
+                            // alert("last roll == ?? | " + lastRollTotal.toString() + " == " + comeBet['betNumber']);
+                            if(lastRollTotal == comeBet['betNumber']) {
+                               // do payout & remove come bet from specified value
+                                alert("paying out come bet ( +" + bets.totals["come" + comeBet['betNumber']] + " ) with roll of " + lastRollTotal);
+                                client.money += bets.totals["come" + comeBet['betNumber']];
+                                // bets.totals["come" + comeBet['betNumber'].toString()] = undefined;
+                                // bets.payoutDrawWinningChipAnimation(dice.wordFromValue(comeBet[Object.keys(comeBet)[0]]));
+                                bets.payoutDrawWinningChipAnimation("come" + comeBet['betNumber'].toString());
+                                bets.clearSingleComeBet(comeBet['betNumber']);
+                            }
+                        });
+                    }
+                        
+                    // move current come bet to current roll and reset come bet to none
+                    // alert("chip = " + chip.position.x);
+                    if((lastRollTotal >=4 && lastRollTotal <= 10) && lastRollTotal != 7) {
+                        if(bets.totals["come"] != undefined) {
+                            var betTotal =  bets.totals["come"];
+                            if(bets.totals["come" + lastRollTotal.toString()] == undefined)
+                                bets.totals["come" + lastRollTotal.toString()] = 0;
+                            bets.totals["come" + (lastRollTotal.toString())] += betTotal; 
+                            bets.totals["come"] = undefined;
+                            // need to for loop all bets on come and move all chips
+                            // ----------------------------------------------------
+                            var chip = chips.getChipsByBetType("come")[0];
+                            if(chip) {
+                                chip.bet.type = lastRollTotalText;
+                                
+                                chips.chipSlideTo(chip, table.locations[lastRollTotalText][0][0], table.locations[lastRollTotalText][0][1]);
+                            }
+                        }
+                    }
+                }
+            
+                static getComeBets() {
+                    var _bets = {}; // 4 5 6 8  9 10
+                    var _bets2 = [];
+                    for(var i = 4; i<=10; i++) {
+                        if(i == 7) continue;
+                        var cb = bets.totals["come" + i.toString()];
+                        if(cb != undefined) {
+                            _bets[i.toString()] = cb;
+                            _bets2.push({
+                                'bet': bets.totals["come" + i.toString()],
+                                'betNumber': i
+                            });
+                        }
+                    }
+                    return [_bets, _bets2];
+                }
+            
+                static clearComeBets() {
+                    for(var i = 4; i<=10; i++) {
+                        if(i == 7) continue;
+                        bets.totals["come" + i.toString()] = undefined;
+                        helpers.deleteObj(chips.getChipsByBetType(dice.wordFromValue(i))[0]);
+                    }
+                }
+            
+                static clearSingleComeBet(number) {
+                    bets.totals["come" + number.toString()] = undefined;
+                    helpers.deleteObj(chips.getChipsByBetType(dice.wordFromValue(number))[0]);
+                }
+            
+                static clearAndTake() {
+                    client.money -= bets.total;
+                    chips.all.forEach(function(chip) {
+                       helpers.deleteObj(chip); 
+                    });
+                    chips.all = [];
+                    bets.total = 0;
+                    bets.clearComeBets();
+                    bets.totals = {};
+                    chips.moveAsPointChipToNone(chipPoint);
+                    ui.refreshBetPanel();
+                }
+            
+                static clearAndGive() {
+                    bets.total = 0;
+                    bets.totals = {};
+                    chips.all.forEach(function(chip) {
+                       helpers.deleteObj(chip); 
+                    });
+                    ui.refreshBetPanel();
+                }
+            
+                static clear() {
+                    
+                }
+            }
+            
+            class table {
+                static chipsOnTable = [];
+                static currentPoint = 0;
+                static currentRoller = undefined;
+                static currentRollerIndex = -1;
+                static rollTimeout = 7000;
+                static lastRollTime = helpers.timeNowMS();
+                static locations = {
+                    "passline":[[-5,2],[-5,1],[-5,0]],
+                    "come":[[-3,1],[-2.5,1] [2.5,1],[3,1]],
+                    "field":[[-3,-0.5]],
+                    "four":[[-2.8,2]],
+                    "come4":[[2.8,2]],
+                    "five":[[-1.5,2]],
+                    "come5":[[-1.5,2]],
+                    "six":[[-0.6,2]],
+                    "come6":[[-0.6,2]],
+                    "eight":[[0.6,1.7]],
+                    "come8":[[0.6,1.7]],
+                    "nine":[[1.7,2]],
+                    "come9":[[1.7,2]],
+                    "ten":[[2.8,2]],
+                    "come10":[[2.8,2]],
+                    "dont pass":[[-3.7,2]],
+                    "hard two": [[-0.6,-0.68]],
+                    "hard three":[[-0.4,-1.4]],
+                    "hard four": [[0.4,-0.12]],
+                    "hard six": [[-0.4, 0.28]],
+                    "hard eight": [[-0.4, -0.12]],
+                    "hard ten": [[0.4, 0.28]],
+                    "hard eleven": [[0.5, -1.2]],
+                    "hard twelve":[[0.5,-0.68]],
+                    "horn bet": [[0.28,-1]],
+                    "seven":[[]],
+                    "any craps": [[0.2,-1.75]]
+                    
+                }
+                static getRandomLocation(betType) {
+                    betType = betType.toLowerCase();
+                    var typeLoc = table.locations[betType];
+                    var location = typeLoc.random();
+                    return location;
+                }
+                static clearTable() {
+                    chipsOnTable.forEach(function (chip) {
+                        
+                    });
+                }
+                static getNextRoller() {
+                    // todo ---
+                    if(table.currentRoller == undefined) {
+                        table.currentRoller = clientContainer.players[table.currentRollerIndex++];
+                    } else {
+                        table.currentRoller = clientContainer.players[table.currentRollerIndex++];
+                    }
+                }
+            }
+            
+            class chips {
+                static colors = {
+                    white:0xffffff,
+                    red:0x9a090e,
+                    green:0x0c7a28,
+                    blue:0x1c488c,
+                    gold:0xc1b64a,
+                    point:0xed4fe6
+                }
+                static colorValues = {
+                    "ffffff": 5,
+                    "9a090e": 10,
+                    "c7a28": 20,
+                    "1c488c": 50,
+                    "c1b64a": 100
+                }
+                static chipValues = {
+                    5: 0xffffff,
+                    10: 0x9a090e,
+                    20: 0x0c7a28,
+                    50: 0x1c488c,
+                    100: 0xc1b64a
+                }
+            
+                static chipSlideArray = []
+                static currentSelection = 5;
+                static all = [];
+            
+                static getChipsByBetType(betType) {
+                    betType = betType.toLowerCase();
+                    var chipsArray = [];
+                    chips.all.forEach(function(chip) {
+                        if(chip.bet != undefined) {
+                            if(chip.bet.type == betType) {
+                                chipsArray.push(chip);
+                            }
+                        }
+                    });
+                    return chipsArray;
+                }
+            
+                static getValueFromColor(chip) {
+                    var color = chip.color.toString(16);
+                    var value = chips.colorValues[color];
+                    return value;
+                }
+            
+                static getColorFromValue(value) {
+                    return chips.chipValues[value];
+                }
+
+                static drawChip(x, y, color=0xffffff, dontAddToAllArray=false) {
+                    const textureLoader = new THREE.TextureLoader();
+                    const chipTexture = textureLoader.load("./textures/chip.png");
+                    var material = new THREE.MeshBasicMaterial({
+                        map: chipTexture,
+                        color: color
+                    });
+
+                    var radius = 0.15;
+                    var segments = 12; //<-- Increase or decrease for more resolution I guess                                
+                    var circleGeometry = new THREE.CircleGeometry(radius, segments);  
+                    var circle = new THREE.Mesh(circleGeometry, material);
+                    circle.position.x = x;
+                    circle.position.y = y;
+                    circle.name = "chip";
+                    circle.color = color.toString(16);
+                    // alert(circle.color);
+                    scene.scene.add(circle);
+                    if(!dontAddToAllArray)
+                        chips.all.push(circle);
+                    return circle;
+                }
+            
+                static drawChipAndSlideTo(x, y, xto, yto, color=0xffffff, randomize = true, deleteOnDestination = false) {
+                    var chip = chips.drawChip(x, y, color);
+                    chip.slideToX = xto;
+                    chip.slideToY = yto;
+                    if(randomize) {
+                        var ran1 = helpers.randomNumberDecimal(0,1) / 50;
+                        var ran2 = helpers.randomNumberDecimal(0,1) / 50;
+                        if(helpers.randomNumber(0,1) == 0) ran1 *= -1;
+                        if(helpers.randomNumber(0,1) == 0) ran2 *= -1;
+                        chip.slideToX += ran1;
+                        chip.slideToy += ran2;
+                    }
+                    if(deleteOnDestination)
+                        chip.slideToDeleteOnDestination = true;
+                    chips.chipSlideArray.push(chip);
+                    return chip;
+                }
+            
+                static chipSlideTo(chip, x, y) {
+                    chip.slideToX = x;
+                    chip.slideToY = y;
+                    var ran1 = helpers.randomNumberDecimal(0,1) / 50;
+                    var ran2 = helpers.randomNumberDecimal(0,1) / 50;
+                    if(helpers.randomNumber(0,1) == 0) ran1 *= -1;
+                    if(helpers.randomNumber(0,1) == 0) ran2 *= -1;
+                    chip.slideToX += ran1;
+                    chip.slideToy += ran2;
+                    chips.chipSlideArray.push(chip);
+                    return chip;
+                }
+            
+                static chipSlideToAndDelete(chip, x, y) {
+                    chip.slideToX = x;
+                    chip.slideToY = y;
+                    var ran1 = helpers.randomNumberDecimal(0,1) / 50;
+                    var ran2 = helpers.randomNumberDecimal(0,1) / 50;
+                    if(helpers.randomNumber(0,1) == 0) ran1 *= -1;
+                    if(helpers.randomNumber(0,1) == 0) ran2 *= -1;
+                    chip.slideToX += ran1;
+                    chip.slideToy += ran2;
+                    chips.chipSlideArray.push(chip);
+                    chip.slideToDeleteOnDestination = true;
+                    return chip;
+                }
+            
+                static chipSlideToPlayerLocation(chip, playerIndex=0) {
+                    if(playerIndex>= 5) {
+                        return chip;
+                    }
+                    var slideLocations = {
+                        0:[7,-2.5]
+                    }
+                    var slideLocation = slideLocations[playerIndex];
+                    chips.chipSlideToAndDelete(chip, slideLocation[0],slideLocation[1]);
+                    return chip;
+                }
+            
+                static delete(chip) {
+                    helpers.deleteObj(chip);
+                }
+            
+                static moveAsPointChipToNone(pointChip) {
+                    chips.chipSlideTo(pointChip, 6, -2);
+                }
+            }
+            
+            class dice {
+                static faceDirection = [[22,20.5], [6,7.71], [20,20], [300,245], [0,0], [6,3]];
+                static lastRollTotal = 0;
+                static timedOut = false;
+                static die = [];
+                static lastRollDie = [0,0];
+                static new(diceMaterials) {
+                    const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+                    const dice1 = new THREE.Mesh(cubeGeometry, diceMaterials);
+                    const dice2 = new THREE.Mesh(cubeGeometry, diceMaterials);
+                    dice1.name = "dice1";
+                    dice2.name = "dice2";
+                    dice1.position.copy(new THREE.Vector3(-1, 3, 0));
+                    
+                    dice2.rotation.x = helpers.randomNumber(0,100);
+                    dice2.rotation.y = helpers.randomNumber(0,100);
+                    dice2.position.copy(new THREE.Vector3(-0, 3, 0));
+                    dice.die = [dice1, dice2];
+                    return [dice1, dice2];
+                }
+                
+                static showDiceFace(diceObject, number) {
+                    if(number <= 6 && number >= 1) {
+                        diceObject.rotation.x = dice.faceDirection[number-1][0];
+                        diceObject.rotation.y = dice.faceDirection[number-1][1];
+                    }
+                }
+            
+                static forceRoll(die, number,audio=true) {
+                    if(number >= 2 && number <= 12) {
+                        var half = Math.floor(number / 2);
+                        var dice1roll = helpers.randomNumber(1, half + 1);
+                        var dice2roll = number - dice1roll;
+                        var dice2rollExccess = 0;
+                        if(dice2roll >= 7)
+                        {
+                            dice2rollExccess = dice2roll - 6;
+                            dice2roll = dice2roll - dice2rollExccess;
+                            dice1roll += dice2rollExccess;
+                        }
+                        dice.showDiceFace(die[0], dice1roll);
+                        dice.showDiceFace(die[1], dice2roll);
+                        dice.lastRollTotal = dice1roll + dice2roll;
+                        dice.lastRollDie = [dice1roll, dice2roll];
+                        var isHard = (dice1roll == dice2roll);
+                        if(audio) helpers.schedule(600, function() {sounds.announcer.voiceRoll(dice.lastRollTotal); }, isHard);
+                        return [dice1roll, dice2roll];
+                    }
+                    return [0,0];
+                }
+            
+                static onClick() {
+                    if(dice.timedOut == false) {
+                        if(rollingDiceWaiting == true) {
+                            dice.die[0].position.z = 0;
+                            dice.die[1].position.z = 0;
+                            rollingDiceWaiting = false;
+                        } else if(rollingDice == false) {
+                            if(bets.total <= 0) {
+                                document.getElementById("test-text").innerText = "You need to place a bet before trying to roll the dice!";
+                                sounds.play(sounds.clicksound1);
+                            } else {
+                                rollingDice = true;
+                                sounds.play(sounds.diceShakeSound);
+                                ui.hideBetPanel();
+                                dice.timedOut = true;
+                                helpers.schedule(3500, function() {dice.timedOut = false;dice.die[0].position.z = 0;dice.die[1].position.z = 0;rollingDiceWaiting = false;});
+                            }
+                        }
+                    }
+                }
+            
+                static wordFromValue(val) {
+                    var d = {
+                        1:"One",
+                        2:"Two",
+                        3:"Three",
+                        4:"Four",
+                        5:"Five",
+                        6:"Six",
+                        7:"Seven",
+                        8:"Eight",
+                        9:"Nine",
+                        10:"Ten",
+                        11:"Eleven",
+                        12:"Twelve"
+                    }
+                    
+                    return d[val];
+                }
+            }
+            
+            class scene {
+                static setup() {
+                    const sscene = new THREE.Scene();
+                    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                    camera.position.z = 5;
+                    const renderer = new THREE.WebGLRenderer();
+                    renderer.setClearColor(0xffffff,0);
+                    var ambientLight = new THREE.AmbientLight(0xffffff); 
+                    sscene.add(ambientLight);
+                    const textureLoader = new THREE.TextureLoader();
+                    const diceTexture = textureLoader.load("./textures/dice.jpg");
+                    const diceMaterials = [];
+                    for(var i=0; i<=5; i++) {
+                        var dmat = new THREE.MeshStandardMaterial({
+                            map: textureLoader.load("./textures/dice" + (i + 1) + ".png")
+                        });
+                        diceMaterials.push(dmat);
+                    }
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                    document.body.appendChild(renderer.domElement);
+                    var die = dice.new(diceMaterials);
+                    sscene.add(die[0]);
+                    sscene.add(die[1]);
+                    
+                    // Static variables set
+                    scene.scene = sscene;
+                    scene.camera = camera;
+                    scene.renderer = renderer;
+                    scene.ambientLight = ambientLight;
+                    scene.textureLoader = textureLoader;
+                    scene.diceTexture = diceTexture;
+                    scene.diceMaterials = diceMaterials;
+                    
+                    /*const boardTextureLoader = new THREE.TextureLoader();
+                    const cubeGeometry = new THREE.BoxGeometry(15.5, 7.5, 0);
+                    const boardmaterial = new THREE.MeshBasicMaterial( { map: boardTextureLoader.load('./textures/crapstable.jfif'), } );
+                    const board = new THREE.Mesh(cubeGeometry, boardmaterial);
+                    board.position.copy(new THREE.Vector3(0, 0, -10));
+                    sscene.add(board);*/
+                    return die;
+                }
+            }
+            
+            // ************ Logic **************
+            // *********************************
+            for(var i=0;i<10;i++)
+                console.log(helpers.randomNumber(0,1))
+            var rollingDice = false;
+            var rollingDiceWaiting = false;
+            var die = scene.setup();
+            ui.refreshBetPanel();
+            
+            var chipPositionShifterX = 1.8;
+            var chipPositionShifterY = -0.45;
+            var chip1 = chips.drawChip(1 + chipPositionShifterX,-3 + chipPositionShifterY,chips.colors.white,true);
+            var chip2 = chips.drawChip(1.5 + chipPositionShifterX,-3 + chipPositionShifterY, chips.colors.red,true);
+            var chip3 = chips.drawChip(2 + chipPositionShifterX,-3 + chipPositionShifterY, chips.colors.green,true);
+            var chip4 = chips.drawChip(2.5 + chipPositionShifterX,-3 + chipPositionShifterY, chips.colors.blue,true);
+            var chip5 = chips.drawChip(3 + chipPositionShifterX,-3 + chipPositionShifterY, chips.colors.gold,true);
+            var chipPoint = chips.drawChip(6,-2, chips.colors.point, true);
+
+            console.log(helpers.timeNowMS());
+
+            // Mouse input handler for now
+            // Needs to be cleaned up and put in a class
+            window.onload = function() {
+                var raycaster = new THREE.Raycaster();
+                var mouse = new THREE.Vector2();
+
+                function onDocumentMouseDown(event) {
+                    event.preventDefault();
+                    mouse.x = (event.clientX / scene.renderer.domElement.clientWidth) * 2 - 1;
+                    mouse.y =  - (event.clientY / scene.renderer.domElement.clientHeight) * 2 + 1;
+                    raycaster.setFromCamera(mouse, scene.camera);
+                    objectsToDetect = [die[0], die[1], chip1, chip2, chip3, chip4, chip5];
+                    var intersects = raycaster.intersectObjects(objectsToDetect);
+                    if (intersects.length > 0) {
+                        // Checking the type of object we clicked with below
+                        if(intersects[0].object.name.includes("dice")) {
+                            if(helpers.timeSince(table.lastRollTime) >= table.rollTimeout) {
+                                dice.onClick();
+                            } else {
+                                ui.dealerSay("We are in the betting phase, you cannot roll the dice yet.");
+                                sounds.play(sounds.clicksound1);
+                            }
+                        } else if(intersects[0].object.name.includes("chip")) {
+                            document.getElementById("test-text").innerText = "Current Selected Chip: ($" + chips.getValueFromColor(intersects[0].object) + ")";
+                            document.getElementById("pb-currentSelection").innerText = "Current Selected Chip: ($" + chips.getValueFromColor(intersects[0].object) + ")";
+                            sounds.play(sounds.clicksound1, 0.1);
+                            chips.currentSelection = chips.getValueFromColor(intersects[0].object);
+                        }
+                    }
+                }
+                document.addEventListener('mousedown', onDocumentMouseDown, false);
+            };
+			
+			function animate() {
+				requestAnimationFrame( animate );
+                
+                // Chip animations
+                // ---------------
+                if(chips.chipSlideArray.length > 0) {
+                    var chipsToRemove = [];
+                    chips.chipSlideArray.forEach(function (chip, index) {
+                        if(chip.position.x < chip.slideToX)
+                            chip.position.x += 0.05;
+                        else if(chip.position.x > chip.slideToX)
+                            chip.position.x -= 0.05;
+                        if(chip.position.y < chip.slideToY)
+                            chip.position.y += 0.05;
+                        else if(chip.position.y > chip.slideToY)
+                            chip.position.y -= 0.05;
+                        
+                        var v1 = new THREE.Vector2(chip.position.x, chip.position.y);
+                        var v2 = new THREE.Vector2(chip.slideToX,chip.slideToY);
+                        
+                        if(v1.distanceTo(v2) <= 0.5) {
+                            const index = chips.chipSlideArray.indexOf(chip);
+                            if (index > -1) {
+                                chipsToRemove.push(chip);
+                            }
+                        }
+                    });
+                    chipsToRemove.forEach(function(chip) {
+                        var success = helpers.arrayRemove(chips.chipSlideArray, chip);
+                        if(success != undefined)
+                            if(chip.slideToDeleteOnDestination)
+                                helpers.deleteObj(chip);
+                        
+                        /*const index = chips.chipSlideArray.indexOf(chip);
+                        if (index > -1) {
+                            chips.chipSlideArray.splice(index, 1);
+                            if(chip.slideToDeleteOnDestination)
+                                helpers.deleteObj(chip);
+                        }*/
+                        
+                    });
+                }
+                
+                // Dice constant spinning animation
+                // ---------------------------------
+                if(!rollingDiceWaiting) {
+                    die[0].rotation.x += helpers.randomNumber(1,5) * 0.01;
+                    die[0].rotation.y += helpers.randomNumber(1,5) * 0.01;
+                    die[1].rotation.x += helpers.randomNumber(1,5) * 0.01;
+                    die[1].rotation.y += helpers.randomNumber(1,5) * 0.01;
+                }
+                
+                // User dice roll animation
+                // ------------------------
+                if(rollingDice){
+                    if(die[0].position.z < -45) {
+                        rollingDice = false;
+                        rollingDiceWaiting = true;                        
+                        roll = helpers.randomNumber(2, 12);
+                        // roll = 6;
+                        var froll = dice.forceRoll(die, roll);
+                        var frollTotal = froll[0] + froll[1];
+                        var initialRollWin = false;
+                        if(table.currentPoint == 0) {
+                            if(frollTotal == 2 || frollTotal == 3 || frollTotal == 12) {
+                                document.getElementById("test-text").innerText = "No current Point, user rolled craps (" + frollTotal + ")";
+                                bets.payoutDontPassCheck();
+                                bets.clearAndTake();
+                                sounds.play(sounds.aww, 0.1);
+                                helpers.schedule(600, ()=>{sounds.announcer.voiceRoll(7,false,true);});
+                                ui.showBetPanel();
+                                return;
+                            } else if(frollTotal == 7 || frollTotal == 11) {
+                                document.getElementById("test-text").innerText = "Initial craps (" + frollTotal + "), paying out and resetting point";
+                                bets.payoutDontPassCheck();
+                                sounds.play(sounds.applause1Sound);
+                                initialRollWin = true;
+                                bets.payout();
+                            } else {
+                                document.getElementById("test-text").innerText = "The table's point is: " + table.currentPoint;
+                                table.currentPoint = frollTotal;
+                                var textTotal = dice.wordFromValue(table.currentPoint).toLowerCase();
+                                var pointPosition = table.getRandomLocation(textTotal);
+                                chips.chipSlideTo(chipPoint, pointPosition[0], pointPosition[1]);
+                                sounds.play(sounds.goodRollSound, 0.18);
+                            }
+                        } else if(frollTotal == table.currentPoint) {
+                            bets.payoutAndMoveComeBets();
+                            bets.payoutDontPassCheck();
+                            bets.payoutFieldCheck();
+                            bets.payout();
+                            table.currentPoint = 0;
+                            sounds.play(sounds.applause1Sound);
+                            chips.moveAsPointChipToNone(chipPoint);
+                        }
+                        if(!initialRollWin) {
+                            if(frollTotal == 7) {
+                                // sounds.play(sounds.rollFail, 0.18);
+                                bets.payoutAndMoveComeBets();
+                                bets.payoutDontPassCheck();
+                                sounds.play(sounds.aww, 0.1);
+                                sounds.announcer.voiceRoll("craps",false,true);
+                                document.getElementById("test-text").innerText = "Roller crapped out (7), the point has been reset";
+                                table.currentPoint = 0;
+                                bets.clearAndTake();
+                                chips.moveAsPointChipToNone(chipPoint);
+                                //here
+
+                            } else {
+                                
+                                document.getElementById("test-text").innerText = "You rolled a: " + froll[0] + " & " + froll[1] + " (" + frollTotal + ") | Table Point: " + table.currentPoint;
+                                bets.payoutHardCheck();
+                                bets.payoutAndMoveComeBets();
+                                bets.payoutFieldCheck();
+                                bets.checkForPayout();
+                            }
+                            
+                        }
+                        bets.removeHardbets([2,12,3,11]);
+                        initialRollWin = false;
+                        ui.refreshBetPanel();
+                        ui.showBetPanel();
+                        table.lastRollTime = helpers.timeNowMS();
+                        ui.countDown(7);
+                    } else {
+                        die[0].position.z -= 0.15;
+                        die[1].position.z -= 0.15;
+                        
+                    }
+                }
+				scene.renderer.render(scene.scene, scene.camera);
+			}
+            animate();
+		</script>
+	</body>
+</html>
